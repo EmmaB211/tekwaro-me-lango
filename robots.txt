@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emmab211.github.io/tekwaro-me-lango/sitemap.xml

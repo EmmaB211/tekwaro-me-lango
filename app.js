@@ -16,6 +16,15 @@ primaryNav.addEventListener("click", (event) => {
   }
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.querySelector(".sr-only").textContent = "Open menu";
+    primaryNav.classList.remove("is-open");
+    menuToggle.focus();
+  }
+});
+
 const searchInput = document.querySelector("#archive-search");
 const categoryFilter = document.querySelector("#archive-filter");
 const archiveItems = [...document.querySelectorAll(".archive-item")];
@@ -40,10 +49,37 @@ function filterArchive() {
 searchInput.addEventListener("input", filterArchive);
 categoryFilter.addEventListener("change", filterArchive);
 
+const dictionaryInput = document.querySelector("#dictionary-search");
+const dictionaryFilter = document.querySelector("#dictionary-filter");
+const dictionaryEntries = [...document.querySelectorAll(".dictionary-entry[data-status='published']")];
+const dictionaryEmpty = document.querySelector("#dictionary-empty");
+
+function filterDictionary() {
+  const query = dictionaryInput.value.trim().toLocaleLowerCase();
+  const category = dictionaryFilter.value;
+  let visibleCount = 0;
+
+  for (const entry of dictionaryEntries) {
+    const matchesText = entry.textContent.toLocaleLowerCase().includes(query);
+    const matchesCategory = category === "all" || entry.dataset.type === category;
+    const isVisible = matchesText && matchesCategory;
+    entry.hidden = !isVisible;
+    visibleCount += Number(isVisible);
+  }
+
+  dictionaryEmpty.hidden = visibleCount > 0;
+  dictionaryEmpty.textContent = dictionaryEntries.length === 0
+    ? "No language entries have been culturally verified for publication yet."
+    : "No verified public entries match this search.";
+}
+
+dictionaryInput.addEventListener("input", filterDictionary);
+dictionaryFilter.addEventListener("change", filterDictionary);
+
 document.querySelector("#contact-form").addEventListener("submit", (event) => {
   event.preventDefault();
   document.querySelector("#form-notice").textContent =
-    "Demo only: this form does not transmit or store your message. An approved contact service must be connected before launch.";
+    "Demo checks passed. Nothing was sent or saved. Do not use this prototype to submit real content or personal information.";
 });
 
 document.querySelector("#year").textContent = new Date().getFullYear();
